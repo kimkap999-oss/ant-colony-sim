@@ -86,11 +86,16 @@ class World {
             e.target.classList.toggle('active');
         });
 
-        // Keyboard controls
+        // Track pressed keys for smooth camera movement
+        this.keysPressed = new Set();
+        
         document.addEventListener('keydown', (e) => {
+            this.keysPressed.add(e.key);
+            
             switch (e.key) {
                 case ' ':
                     this.paused = !this.paused;
+                    e.preventDefault();
                     break;
                 case 'd':
                 case 'D':
@@ -112,8 +117,59 @@ class World {
                 case '4':
                     this.speed = 4;
                     break;
+                case '+':
+                case '=':
+                    this.renderer.camera.zoom = Math.min(3, this.renderer.camera.zoom * 1.2);
+                    break;
+                case '-':
+                case '_':
+                    this.renderer.camera.zoom = Math.max(0.3, this.renderer.camera.zoom / 1.2);
+                    break;
+                case 'Home':
+                    // Reset camera
+                    this.renderer.camera.x = 0;
+                    this.renderer.camera.y = 0;
+                    this.renderer.camera.zoom = 1;
+                    break;
             }
         });
+        
+        document.addEventListener('keyup', (e) => {
+            this.keysPressed.delete(e.key);
+        });
+        
+        // Mouse drag to pan
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        
+        this.renderer.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && e.shiftKey) {
+                isDragging = true;
+                dragStart = { x: e.clientX, y: e.clientY };
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+                this.renderer.camera.x -= dx / this.renderer.camera.zoom;
+                this.renderer.camera.y -= dy / this.renderer.camera.zoom;
+                dragStart = { x: e.clientX, y: e.clientY };
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // Mouse wheel to zoom
+        this.renderer.canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            this.renderer.camera.zoom = Math.max(0.3, Math.min(3, this.renderer.camera.zoom * zoomFactor));
+        }, { passive: false });
 
         // Click to add food
         this.renderer.canvas.addEventListener('click', (e) => {
@@ -134,6 +190,21 @@ class World {
     }
 
     update(deltaTime) {
+        // Camera movement (always runs even when paused)
+        const camSpeed = 300 / this.renderer.camera.zoom;
+        if (this.keysPressed.has('ArrowLeft') || this.keysPressed.has('a')) {
+            this.renderer.camera.x -= camSpeed * deltaTime;
+        }
+        if (this.keysPressed.has('ArrowRight') || this.keysPressed.has('d') && !this.keysPressed.has('Shift')) {
+            this.renderer.camera.x += camSpeed * deltaTime;
+        }
+        if (this.keysPressed.has('ArrowUp') || this.keysPressed.has('w')) {
+            this.renderer.camera.y -= camSpeed * deltaTime;
+        }
+        if (this.keysPressed.has('ArrowDown') || this.keysPressed.has('s')) {
+            this.renderer.camera.y += camSpeed * deltaTime;
+        }
+        
         if (this.paused) return;
         
         const dt = deltaTime * this.speed;

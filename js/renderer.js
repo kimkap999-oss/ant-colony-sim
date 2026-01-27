@@ -46,8 +46,14 @@ export class Renderer {
     }
 
     clear() {
+        const ctx = this.ctx;
+        const cam = this.camera;
+        
+        // Reset transform before clearing
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        
         // Sky gradient at top, soil below
-        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        const gradient = ctx.createLinearGradient(0, 0, 0, this.canvas.height);
         gradient.addColorStop(0, '#87CEEB');    // Sky
         gradient.addColorStop(0.15, '#5a9fd4'); // Horizon
         gradient.addColorStop(0.18, '#8B7355'); // Surface
@@ -55,14 +61,24 @@ export class Renderer {
         gradient.addColorStop(0.4, '#4a3423');  // Soil
         gradient.addColorStop(1, '#2d1b0e');    // Deep soil
         
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Surface grass
-        this.ctx.fillStyle = '#228B22';
-        for (let x = 0; x < this.canvas.width; x += 8) {
+        // Apply camera transform
+        ctx.setTransform(
+            cam.zoom, 0, 0, cam.zoom,
+            this.canvas.width / 2 - cam.x * cam.zoom,
+            this.canvas.height / 2 - cam.y * cam.zoom
+        );
+        
+        // Offset to center the view on (0,0) being top-left of world
+        ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+
+        // Surface grass (drawn in world space now)
+        ctx.fillStyle = '#228B22';
+        for (let x = 0; x < this.canvas.width * 2; x += 8) {
             const height = 5 + Math.sin(x * 0.1) * 3;
-            this.ctx.fillRect(x, this.canvas.height * 0.17 - height, 3, height);
+            ctx.fillRect(x - this.canvas.width / 2, this.canvas.height * 0.17 - height, 3, height);
         }
     }
 
@@ -249,6 +265,9 @@ export class Renderer {
     }
 
     renderUI(stats) {
+        // Reset transform for UI (screen space)
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        
         // Update DOM elements
         document.getElementById('stat-population').textContent = stats.population;
         document.getElementById('stat-food').textContent = stats.food;
