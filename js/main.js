@@ -67,22 +67,16 @@ class World {
     _setupUI() {
         document.getElementById('btn-pause').addEventListener('click', () => {
             this.paused = !this.paused;
-            document.getElementById('btn-pause').textContent = 
-                this.paused ? '▶️ Resume' : '⏸️ Pause';
+            document.getElementById('btn-pause').textContent = this.paused ? '▶️' : '⏸️';
         });
 
         document.getElementById('btn-speed').addEventListener('click', () => {
             this.speed = this.speed >= 4 ? 1 : this.speed * 2;
-            document.getElementById('btn-speed').textContent = `⏩ ${this.speed}x`;
+            document.getElementById('btn-speed').textContent = `${this.speed}×`;
         });
 
         document.getElementById('btn-pheromones').addEventListener('click', (e) => {
             this.renderer.showPheromones = !this.renderer.showPheromones;
-            e.target.classList.toggle('active');
-        });
-
-        document.getElementById('btn-debug').addEventListener('click', (e) => {
-            this.renderer.showDebug = !this.renderer.showDebug;
             e.target.classList.toggle('active');
         });
 

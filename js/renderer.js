@@ -269,13 +269,9 @@ export class Renderer {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         
         // Update DOM elements
-        document.getElementById('stat-population').textContent = stats.population;
-        document.getElementById('stat-food').textContent = stats.food;
-        document.getElementById('stat-materials').textContent = stats.materials;
-        document.getElementById('stat-larvae').textContent = stats.larvae;
-        document.getElementById('stat-chambers').textContent = stats.chambers;
+        document.getElementById('stat-population').textContent = `🐜 ${stats.population}`;
+        document.getElementById('stat-food').textContent = `🌰 ${stats.food}`;
         document.getElementById('day-count').textContent = `Day ${stats.day}`;
-        document.getElementById('time-of-day').textContent = stats.timeString;
     }
 
     renderDebugInfo(world) {
