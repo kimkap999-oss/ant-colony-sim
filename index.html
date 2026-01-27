@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐜 Ant Colony Simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="colony-canvas"></canvas>
+        
+        <div id="ui-overlay">
+            <div id="stats-panel">
+                <h2>🐜 Colony Stats</h2>
+                <div class="stat-row">
+                    <span class="stat-label">Population:</span>
+                    <span id="stat-population">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Food:</span>
+                    <span id="stat-food">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Materials:</span>
+                    <span id="stat-materials">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Larvae:</span>
+                    <span id="stat-larvae">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Chambers:</span>
+                    <span id="stat-chambers">0</span>
+                </div>
+            </div>
+            
+            <div id="resource-panel">
+                <h3>📦 Resources</h3>
+                <div class="resource-bar">
+                    <span>Seeds</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" id="bar-seeds"></div>
+                    </div>
+                </div>
+                <div class="resource-bar">
+                    <span>Fungus</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" id="bar-fungus"></div>
+                    </div>
+                </div>
+                <div class="resource-bar">
+                    <span>Honeydew</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" id="bar-honeydew"></div>
+                    </div>
+                </div>
+                <div class="resource-bar">
+                    <span>Insects</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" id="bar-insects"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="controls-panel">
+                <button id="btn-pause" class="control-btn">⏸️ Pause</button>
+                <button id="btn-speed" class="control-btn">⏩ 1x</button>
+                <button id="btn-pheromones" class="control-btn active">🔬 Pheromones</button>
+                <button id="btn-debug" class="control-btn">🐛 Debug</button>
+            </div>
+            
+            <div id="time-display">
+                <span id="day-count">Day 1</span>
+                <span id="time-of-day">☀️ Morning</span>
+            </div>
+        </div>
+        
+        <div id="tooltip" class="hidden"></div>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
