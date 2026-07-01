@@ -13,7 +13,7 @@ export const ChamberType = {
     NURSERY: 'nursery',
     QUEEN: 'queen',
     WASTE: 'waste',
-    TUNNEL: 'tunnel'
+    TUNNEL: 'tunnel',
 };
 
 export class Chamber {
@@ -37,25 +37,25 @@ export class Colony {
         this.nestX = x;
         this.nestY = y;
         this.world = world;
-        
+
         // Population
         this.ants = [];
         this.antPool = new ObjectPool(() => new Ant(0, 0, this), 200);
         this.maxPopulation = 500;
-        
+
         // Resources
         this.storage = new StorageManager(2000);
-        
+
         // Structure
         this.chambers = [];
         this._initNest();
-        
+
         // Stats
         this.larvae = 0;
         this.eggs = 0;
         this.day = 1;
         this.timeOfDay = 0; // 0-24 hours
-        
+
         // Growth
         this.spawnTimer = 0;
         this.spawnRate = 2; // seconds between spawns
@@ -63,44 +63,36 @@ export class Colony {
 
     _initNest() {
         // Create initial chambers
-        this.chambers.push(new Chamber(
-            ChamberType.ENTRANCE,
-            this.nestX - 15, this.nestY - 10,
-            30, 20
-        ));
-        
-        this.chambers.push(new Chamber(
-            ChamberType.QUEEN,
-            this.nestX - 20, this.nestY + 50,
-            40, 30
-        ));
-        
-        this.chambers.push(new Chamber(
-            ChamberType.FOOD_STORAGE,
-            this.nestX + 30, this.nestY + 30,
-            35, 25
-        ));
-        
-        this.chambers.push(new Chamber(
-            ChamberType.NURSERY,
-            this.nestX - 50, this.nestY + 40,
-            30, 25
-        ));
+        this.chambers.push(
+            new Chamber(ChamberType.ENTRANCE, this.nestX - 15, this.nestY - 10, 30, 20)
+        );
+
+        this.chambers.push(
+            new Chamber(ChamberType.QUEEN, this.nestX - 20, this.nestY + 50, 40, 30)
+        );
+
+        this.chambers.push(
+            new Chamber(ChamberType.FOOD_STORAGE, this.nestX + 30, this.nestY + 30, 35, 25)
+        );
+
+        this.chambers.push(
+            new Chamber(ChamberType.NURSERY, this.nestX - 50, this.nestY + 40, 30, 25)
+        );
     }
 
     spawnAnt(role = AntRole.WORKER) {
         if (this.ants.length >= this.maxPopulation) return null;
-        
+
         const ant = this.antPool.acquire();
         ant.x = this.nestX + (Math.random() - 0.5) * 20;
         ant.y = this.nestY + (Math.random() - 0.5) * 20;
         ant.heading = Math.random() * Math.PI * 2;
         ant.role = role;
         ant.colony = this;
-        
+
         this.ants.push(ant);
         this.world.spatialHash.insert(ant);
-        
+
         return ant;
     }
 
@@ -120,7 +112,7 @@ export class Colony {
             this.timeOfDay = 0;
             this.day++;
         }
-        
+
         // Spawn new ants if food available
         this.spawnTimer += deltaTime;
         if (this.spawnTimer >= this.spawnRate && this.storage.getTotalFood() > 10) {
@@ -149,7 +141,7 @@ export class Colony {
             larvae: this.larvae,
             chambers: this.chambers.length,
             day: this.day,
-            timeOfDay: this.timeOfDay
+            timeOfDay: this.timeOfDay,
         };
     }
 

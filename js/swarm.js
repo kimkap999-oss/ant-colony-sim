@@ -121,7 +121,8 @@ export class SwarmCoordinator {
         const neighbors = this.spatialHash.query(x, y, radius);
         if (neighbors.length === 0) return null;
 
-        let sumX = 0, sumY = 0;
+        let sumX = 0,
+            sumY = 0;
         for (const ant of neighbors) {
             sumX += Math.cos(ant.heading);
             sumY += Math.sin(ant.heading);
@@ -141,9 +142,9 @@ export class SwarmCoordinator {
     // Get nearby signals
     getSignals(type, x, y, radius = 100) {
         const signals = this.globalSignals.get(type) || [];
-        return signals.filter(s => {
+        return signals.filter((s) => {
             const dist = Math.hypot(s.x - x, s.y - y);
-            return dist <= radius && (Date.now() - s.time) < 10000;
+            return dist <= radius && Date.now() - s.time < 10000;
         });
     }
 
@@ -151,7 +152,10 @@ export class SwarmCoordinator {
     cleanupSignals() {
         const now = Date.now();
         for (const [type, signals] of this.globalSignals) {
-            this.globalSignals.set(type, signals.filter(s => now - s.time < 10000));
+            this.globalSignals.set(
+                type,
+                signals.filter((s) => now - s.time < 10000)
+            );
         }
     }
 }

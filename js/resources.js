@@ -10,12 +10,12 @@ export const ResourceType = {
     INSECT: 'insect',
     SOIL: 'soil',
     LEAF: 'leaf',
-    PEBBLE: 'pebble'
+    PEBBLE: 'pebble',
 };
 
 export const ResourceCategory = {
     FOOD: 'food',
-    MATERIAL: 'material'
+    MATERIAL: 'material',
 };
 
 // Resource definitions with properties
@@ -26,7 +26,7 @@ export const ResourceDefs = {
         decayRate: 0.001,
         weight: 1,
         color: '#c4a35a',
-        icon: '🌰'
+        icon: '🌰',
     },
     [ResourceType.FUNGUS]: {
         category: ResourceCategory.FOOD,
@@ -34,7 +34,7 @@ export const ResourceDefs = {
         decayRate: 0.005,
         weight: 0.5,
         color: '#8b5cf6',
-        icon: '🍄'
+        icon: '🍄',
     },
     [ResourceType.HONEYDEW]: {
         category: ResourceCategory.FOOD,
@@ -42,7 +42,7 @@ export const ResourceDefs = {
         decayRate: 0.01,
         weight: 0.3,
         color: '#fbbf24',
-        icon: '🍯'
+        icon: '🍯',
     },
     [ResourceType.INSECT]: {
         category: ResourceCategory.FOOD,
@@ -50,7 +50,7 @@ export const ResourceDefs = {
         decayRate: 0.02,
         weight: 2,
         color: '#ef4444',
-        icon: '🦗'
+        icon: '🦗',
     },
     [ResourceType.SOIL]: {
         category: ResourceCategory.MATERIAL,
@@ -58,7 +58,7 @@ export const ResourceDefs = {
         decayRate: 0,
         weight: 1.5,
         color: '#78350f',
-        icon: '🟤'
+        icon: '🟤',
     },
     [ResourceType.LEAF]: {
         category: ResourceCategory.MATERIAL,
@@ -66,7 +66,7 @@ export const ResourceDefs = {
         decayRate: 0.002,
         weight: 0.2,
         color: '#22c55e',
-        icon: '🍂'
+        icon: '🍂',
     },
     [ResourceType.PEBBLE]: {
         category: ResourceCategory.MATERIAL,
@@ -74,8 +74,8 @@ export const ResourceDefs = {
         decayRate: 0,
         weight: 3,
         color: '#6b7280',
-        icon: '🪨'
-    }
+        icon: '🪨',
+    },
 };
 
 /**
@@ -90,7 +90,7 @@ export class Resource {
         this.quality = 1.0; // Degrades over time
         this.claimed = false;
         this.claimedBy = null;
-        
+
         const def = ResourceDefs[type];
         this.category = def.category;
         this.nutrition = def.nutrition || 0;
@@ -132,12 +132,12 @@ export class StorageManager {
     constructor(capacity = 1000) {
         this.capacity = capacity;
         this.stores = new Map();
-        
+
         // Initialize stores for each resource type
         for (const type of Object.values(ResourceType)) {
             this.stores.set(type, {
                 quantity: 0,
-                quality: 1.0
+                quality: 1.0,
             });
         }
     }
@@ -223,7 +223,7 @@ export class StorageManager {
         for (const [type, store] of this.stores) {
             stats[type] = {
                 quantity: store.quantity,
-                quality: Math.round(store.quality * 100)
+                quality: Math.round(store.quality * 100),
             };
         }
         return stats;
@@ -249,11 +249,17 @@ export class ResourceSpawner {
     }
 
     spawnRandom() {
-        const types = [ResourceType.SEED, ResourceType.SEED, ResourceType.SEED,
-                       ResourceType.FUNGUS, ResourceType.HONEYDEW, ResourceType.INSECT,
-                       ResourceType.LEAF];
+        const types = [
+            ResourceType.SEED,
+            ResourceType.SEED,
+            ResourceType.SEED,
+            ResourceType.FUNGUS,
+            ResourceType.HONEYDEW,
+            ResourceType.INSECT,
+            ResourceType.LEAF,
+        ];
         const type = types[Math.floor(Math.random() * types.length)];
-        
+
         // Spawn in the upper area (surface)
         const x = Math.random() * this.worldWidth;
         const y = Math.random() * (this.worldHeight * 0.3);
