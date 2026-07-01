@@ -287,13 +287,14 @@ export class ResourceSpawner {
         }
     }
 
-    findNearest(x, y, type = null, maxDist = 200) {
+    findNearest(x, y, type = null, maxDist = 200, category = null) {
         let nearest = null;
         let nearestDist = maxDist;
 
         for (const resource of this.resources) {
             if (resource.claimed) continue;
             if (type && resource.type !== type) continue;
+            if (category && resource.category !== category) continue;
 
             const dist = Math.hypot(resource.x - x, resource.y - y);
             if (dist < nearestDist) {
@@ -306,20 +307,6 @@ export class ResourceSpawner {
     }
 
     findNearestFood(x, y, maxDist = 200) {
-        let nearest = null;
-        let nearestDist = maxDist;
-
-        for (const resource of this.resources) {
-            if (resource.claimed) continue;
-            if (resource.category !== ResourceCategory.FOOD) continue;
-
-            const dist = Math.hypot(resource.x - x, resource.y - y);
-            if (dist < nearestDist) {
-                nearest = resource;
-                nearestDist = dist;
-            }
-        }
-
-        return nearest;
+        return this.findNearest(x, y, null, maxDist, ResourceCategory.FOOD);
     }
 }
