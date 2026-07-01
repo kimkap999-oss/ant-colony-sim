@@ -42,6 +42,7 @@ export class SpatialHash {
         const cellRadius = Math.ceil(radius / this.cellSize);
         const cx = Math.floor(x / this.cellSize);
         const cy = Math.floor(y / this.cellSize);
+        const radiusSq = radius * radius;
 
         for (let dx = -cellRadius; dx <= cellRadius; dx++) {
             for (let dy = -cellRadius; dy <= cellRadius; dy++) {
@@ -49,8 +50,9 @@ export class SpatialHash {
                 const cell = this.grid.get(key);
                 if (cell) {
                     for (const entity of cell) {
-                        const dist = Math.hypot(entity.x - x, entity.y - y);
-                        if (dist <= radius) {
+                        const entityDx = entity.x - x;
+                        const entityDy = entity.y - y;
+                        if (entityDx * entityDx + entityDy * entityDy <= radiusSq) {
                             results.push(entity);
                         }
                     }
@@ -142,9 +144,11 @@ export class SwarmCoordinator {
     // Get nearby signals
     getSignals(type, x, y, radius = 100) {
         const signals = this.globalSignals.get(type) || [];
+        const radiusSq = radius * radius;
         return signals.filter((s) => {
-            const dist = Math.hypot(s.x - x, s.y - y);
-            return dist <= radius && Date.now() - s.time < 10000;
+            const dx = s.x - x;
+            const dy = s.y - y;
+            return dx * dx + dy * dy <= radiusSq && Date.now() - s.time < 10000;
         });
     }
 
