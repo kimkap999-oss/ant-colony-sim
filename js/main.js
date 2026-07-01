@@ -263,5 +263,3 @@ function gameLoop(timestamp) {
 }
 
 requestAnimationFrame(gameLoop);
-
-console.log('🐜 Ant Colony Simulator initialized');
