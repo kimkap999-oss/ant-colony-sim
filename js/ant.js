@@ -10,7 +10,7 @@ export const AntRole = {
     WORKER: 'worker',
     FORAGER: 'forager',
     NURSE: 'nurse',
-    SOLDIER: 'soldier'
+    SOLDIER: 'soldier',
 };
 
 export const AntState = {
@@ -22,7 +22,7 @@ export const AntState = {
     FOLLOWING_TRAIL: 'following_trail',
     DIGGING: 'digging',
     NURSING: 'nursing',
-    FLEEING: 'fleeing'
+    FLEEING: 'fleeing',
 };
 
 export class Ant {
@@ -30,35 +30,35 @@ export class Ant {
         this.x = x;
         this.y = y;
         this.colony = colony;
-        
+
         // Movement
         this.heading = Math.random() * Math.PI * 2;
         this.speed = 30 + Math.random() * 20; // pixels per second
         this.turnRate = 3;
-        
+
         // State
         this.role = AntRole.WORKER;
         this.state = AntState.EXPLORING;
         this.stateTimer = 0;
-        
+
         // Carrying
         this.carrying = null;
         this.carryingAmount = 0;
         this.maxCarry = 3;
-        
+
         // Energy
         this.energy = 100;
         this.maxEnergy = 100;
         this.hunger = 0;
-        
+
         // Perception
         this.senseRadius = 40;
         this.homeDirection = 0;
-        
+
         // Visual
         this.size = 4;
         this.legPhase = Math.random() * Math.PI * 2;
-        
+
         // Memory
         this.lastFoodLocation = null;
         this.wanderAngle = 0;
@@ -77,11 +77,11 @@ export class Ant {
     update(deltaTime, world) {
         this.stateTimer += deltaTime;
         this.legPhase += deltaTime * 15;
-        
+
         // Energy consumption
         this.energy -= deltaTime * 0.5;
         this.hunger += deltaTime * 0.3;
-        
+
         // State machine
         switch (this.state) {
             case AntState.EXPLORING:
@@ -105,7 +105,7 @@ export class Ant {
 
         // Deposit pheromones
         this._depositPheromones(world);
-        
+
         // Boundary check
         this._boundaryCheck(world);
     }
@@ -114,7 +114,7 @@ export class Ant {
         // Random walk with bias
         this.wanderAngle += (Math.random() - 0.5) * 2;
         this.heading += this.wanderAngle * deltaTime;
-        
+
         // Check for food pheromones
         const foodGradient = world.pheromones.findGradient(PheromoneType.FOOD, this.x, this.y);
         if (foodGradient.strength > 10) {
@@ -135,14 +135,14 @@ export class Ant {
 
     _seekFood(deltaTime, world) {
         const food = world.resources.findNearestFood(this.x, this.y, this.senseRadius * 2);
-        
+
         if (!food) {
             this.state = AntState.EXPLORING;
             return;
         }
 
         const dist = Math.hypot(food.x - this.x, food.y - this.y);
-        
+
         if (dist < 8) {
             // Pick up food
             const taken = food.harvest(this.maxCarry - this.carryingAmount);
@@ -150,10 +150,10 @@ export class Ant {
                 this.carrying = food.type;
                 this.carryingAmount += taken;
                 this.lastFoodLocation = { x: food.x, y: food.y };
-                
+
                 // Signal other ants
                 world.swarm.emitSignal('food_found', food.x, food.y, 1.0);
-                
+
                 if (this.carryingAmount >= this.maxCarry || food.isEmpty) {
                     this.state = AntState.RETURNING_HOME;
                 }
@@ -197,7 +197,7 @@ export class Ant {
 
     _followTrail(deltaTime, world) {
         const gradient = world.pheromones.findGradient(PheromoneType.FOOD, this.x, this.y);
-        
+
         if (gradient.strength < 5) {
             this.state = AntState.EXPLORING;
             return;
@@ -243,11 +243,11 @@ export class Ant {
     _turnToward(tx, ty, deltaTime) {
         const targetAngle = Math.atan2(ty - this.y, tx - this.x);
         let diff = targetAngle - this.heading;
-        
+
         // Normalize to [-PI, PI]
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
-        
+
         this.heading += Math.sign(diff) * Math.min(Math.abs(diff), this.turnRate * deltaTime);
     }
 
@@ -261,7 +261,7 @@ export class Ant {
             const strength = Math.max(0, 50 - distFromHome * 0.1);
             world.pheromones.deposit(PheromoneType.HOME, this.x, this.y, strength * 0.3);
         }
-        
+
         // Deposit food pheromones when returning with food
         if (this.state === AntState.RETURNING_HOME && this.carrying) {
             world.pheromones.deposit(PheromoneType.FOOD, this.x, this.y, 30);
@@ -271,7 +271,7 @@ export class Ant {
     _boundaryCheck(world) {
         const margin = 10;
         const bounce = Math.PI * 0.75;
-        
+
         if (this.x < margin) {
             this.x = margin;
             this.heading = -this.heading + Math.PI;
@@ -299,7 +299,7 @@ export class Ant {
             size: this.size,
             carrying: this.carrying,
             state: this.state,
-            legPhase: this.legPhase
+            legPhase: this.legPhase,
         };
     }
 }

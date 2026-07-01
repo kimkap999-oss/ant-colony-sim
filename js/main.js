@@ -14,7 +14,7 @@ class World {
     constructor(canvas) {
         this.width = canvas.width;
         this.height = canvas.height;
-        
+
         // Core systems
         this.spatialHash = new SpatialHash(25);
         this.swarm = new SwarmCoordinator(this.spatialHash);
@@ -22,19 +22,15 @@ class World {
         this.resources = new ResourceSpawner(this.width, this.height);
         this.particles = new ParticleSystem(2000);
         this.renderer = new Renderer(canvas);
-        
+
         // Colony (centered, below surface)
-        this.colony = new Colony(
-            this.width / 2,
-            this.height * 0.25,
-            this
-        );
-        
+        this.colony = new Colony(this.width / 2, this.height * 0.25, this);
+
         // Game state
         this.paused = false;
         this.speed = 1;
         this.lastTime = 0;
-        
+
         // Initialize
         this._init();
     }
@@ -42,12 +38,12 @@ class World {
     _init() {
         // Spawn initial resources
         this.resources.spawnInitialResources(60);
-        
+
         // Spawn initial ants
         for (let i = 0; i < 30; i++) {
             this.colony.spawnAnt();
         }
-        
+
         // Deposit initial home pheromones
         for (let i = 0; i < 50; i++) {
             const angle = Math.random() * Math.PI * 2;
@@ -82,10 +78,10 @@ class World {
 
         // Track pressed keys for smooth camera movement
         this.keysPressed = new Set();
-        
+
         document.addEventListener('keydown', (e) => {
             this.keysPressed.add(e.key);
-            
+
             switch (e.key) {
                 case ' ':
                     this.paused = !this.paused;
@@ -127,15 +123,15 @@ class World {
                     break;
             }
         });
-        
+
         document.addEventListener('keyup', (e) => {
             this.keysPressed.delete(e.key);
         });
-        
+
         // Mouse drag to pan
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
-        
+
         this.renderer.canvas.addEventListener('mousedown', (e) => {
             if (e.button === 0 && e.shiftKey) {
                 isDragging = true;
@@ -143,7 +139,7 @@ class World {
                 e.preventDefault();
             }
         });
-        
+
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 const dx = e.clientX - dragStart.x;
@@ -153,30 +149,37 @@ class World {
                 dragStart = { x: e.clientX, y: e.clientY };
             }
         });
-        
+
         document.addEventListener('mouseup', () => {
             isDragging = false;
         });
-        
+
         // Mouse wheel to zoom
-        this.renderer.canvas.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-            this.renderer.camera.zoom = Math.max(0.3, Math.min(3, this.renderer.camera.zoom * zoomFactor));
-        }, { passive: false });
+        this.renderer.canvas.addEventListener(
+            'wheel',
+            (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                this.renderer.camera.zoom = Math.max(
+                    0.3,
+                    Math.min(3, this.renderer.camera.zoom * zoomFactor)
+                );
+            },
+            { passive: false }
+        );
 
         // Click to add food
         this.renderer.canvas.addEventListener('click', (e) => {
             const rect = this.renderer.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
+
             // Only spawn if in the surface area
             if (y < this.height * 0.35) {
                 this.resources.spawnRandom();
                 this.resources.resources[this.resources.resources.length - 1].x = x;
                 this.resources.resources[this.resources.resources.length - 1].y = y;
-                
+
                 // Visual feedback
                 this.particles.emitCollect(x, y, { r: 100, g: 255, b: 100 });
             }
@@ -189,7 +192,10 @@ class World {
         if (this.keysPressed.has('ArrowLeft') || this.keysPressed.has('a')) {
             this.renderer.camera.x -= camSpeed * deltaTime;
         }
-        if (this.keysPressed.has('ArrowRight') || this.keysPressed.has('d') && !this.keysPressed.has('Shift')) {
+        if (
+            this.keysPressed.has('ArrowRight') ||
+            (this.keysPressed.has('d') && !this.keysPressed.has('Shift'))
+        ) {
             this.renderer.camera.x += camSpeed * deltaTime;
         }
         if (this.keysPressed.has('ArrowUp') || this.keysPressed.has('w')) {
@@ -198,21 +204,23 @@ class World {
         if (this.keysPressed.has('ArrowDown') || this.keysPressed.has('s')) {
             this.renderer.camera.y += camSpeed * deltaTime;
         }
-        
+
         if (this.paused) return;
-        
+
         const dt = deltaTime * this.speed;
-        
+
         // Update systems
         this.colony.update(dt);
         this.resources.update(dt);
         this.pheromones.update();
         this.particles.update(dt);
         this.swarm.cleanupSignals();
-        
+
         // Resize handler
-        if (this.width !== this.renderer.canvas.width || 
-            this.height !== this.renderer.canvas.height) {
+        if (
+            this.width !== this.renderer.canvas.width ||
+            this.height !== this.renderer.canvas.height
+        ) {
             this.width = this.renderer.canvas.width;
             this.height = this.renderer.canvas.height;
         }
@@ -221,7 +229,7 @@ class World {
     render(timestamp) {
         this.renderer.updateFPS(timestamp);
         this.renderer.clear();
-        
+
         // Render layers in order
         this.renderer.renderPheromones(this.pheromones);
         this.renderer.renderChambers(this.colony.chambers);
@@ -229,7 +237,7 @@ class World {
         this.renderer.renderResources(this.resources.resources);
         this.renderer.renderAnts(this.colony.ants);
         this.particles.render(this.renderer.ctx);
-        
+
         // UI
         const stats = this.colony.getStats();
         stats.timeString = this.colony.getTimeString();
@@ -247,10 +255,10 @@ let lastTime = 0;
 function gameLoop(timestamp) {
     const deltaTime = Math.min((timestamp - lastTime) / 1000, 0.1);
     lastTime = timestamp;
-    
+
     world.update(deltaTime);
     world.render(timestamp);
-    
+
     requestAnimationFrame(gameLoop);
 }
 

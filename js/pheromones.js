@@ -4,17 +4,17 @@
  */
 
 export const PheromoneType = {
-    HOME: 'home',      // Trail to nest
-    FOOD: 'food',      // Trail to food
-    DANGER: 'danger',  // Avoid this area
-    EXPLORE: 'explore' // Recently explored
+    HOME: 'home', // Trail to nest
+    FOOD: 'food', // Trail to food
+    DANGER: 'danger', // Avoid this area
+    EXPLORE: 'explore', // Recently explored
 };
 
 export const PheromoneColors = {
-    [PheromoneType.HOME]: { r: 100, g: 255, b: 218 },   // Cyan
-    [PheromoneType.FOOD]: { r: 124, g: 181, b: 24 },    // Green
-    [PheromoneType.DANGER]: { r: 239, g: 68, b: 68 },   // Red
-    [PheromoneType.EXPLORE]: { r: 139, g: 92, b: 246 }  // Purple
+    [PheromoneType.HOME]: { r: 100, g: 255, b: 218 }, // Cyan
+    [PheromoneType.FOOD]: { r: 124, g: 181, b: 24 }, // Green
+    [PheromoneType.DANGER]: { r: 239, g: 68, b: 68 }, // Red
+    [PheromoneType.EXPLORE]: { r: 139, g: 92, b: 246 }, // Purple
 };
 
 export class PheromoneGrid {
@@ -24,7 +24,7 @@ export class PheromoneGrid {
         this.cellSize = cellSize;
         this.cols = Math.ceil(width / cellSize);
         this.rows = Math.ceil(height / cellSize);
-        
+
         // Create grids for each pheromone type
         this.grids = new Map();
         for (const type of Object.values(PheromoneType)) {
@@ -32,7 +32,7 @@ export class PheromoneGrid {
         }
 
         // Configuration
-        this.evaporationRate = 0.995;  // Per frame multiplier
+        this.evaporationRate = 0.995; // Per frame multiplier
         this.diffusionRate = 0.1;
         this.maxStrength = 255;
     }
@@ -44,7 +44,7 @@ export class PheromoneGrid {
     _toGrid(x, y) {
         return {
             col: Math.floor(x / this.cellSize),
-            row: Math.floor(y / this.cellSize)
+            row: Math.floor(y / this.cellSize),
         };
     }
 
@@ -80,7 +80,7 @@ export class PheromoneGrid {
         for (let i = 0; i < sampleAngles; i++) {
             const angle = (i / sampleAngles) * Math.PI * 2;
             const strength = this.sampleDirection(type, x, y, angle, 15);
-            
+
             if (strength > bestStrength) {
                 bestStrength = strength;
                 bestAngle = angle;
@@ -102,21 +102,21 @@ export class PheromoneGrid {
         // Simple diffusion (blur)
         for (const [type, grid] of this.grids) {
             const newGrid = new Float32Array(grid.length);
-            
+
             for (let row = 1; row < this.rows - 1; row++) {
                 for (let col = 1; col < this.cols - 1; col++) {
                     const idx = this._index(col, row);
-                    const neighbors = 
-                        grid[this._index(col-1, row)] +
-                        grid[this._index(col+1, row)] +
-                        grid[this._index(col, row-1)] +
-                        grid[this._index(col, row+1)];
-                    
-                    newGrid[idx] = grid[idx] * (1 - this.diffusionRate) + 
-                                   (neighbors / 4) * this.diffusionRate;
+                    const neighbors =
+                        grid[this._index(col - 1, row)] +
+                        grid[this._index(col + 1, row)] +
+                        grid[this._index(col, row - 1)] +
+                        grid[this._index(col, row + 1)];
+
+                    newGrid[idx] =
+                        grid[idx] * (1 - this.diffusionRate) + (neighbors / 4) * this.diffusionRate;
                 }
             }
-            
+
             this.grids.set(type, newGrid);
         }
     }
@@ -128,7 +128,7 @@ export class PheromoneGrid {
             cols: this.cols,
             rows: this.rows,
             cellSize: this.cellSize,
-            color: PheromoneColors[type]
+            color: PheromoneColors[type],
         };
     }
 

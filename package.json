@@ -1,0 +1,32 @@
+{
+  "name": "ant-colony-sim",
+  "version": "1.0.0",
+  "description": "A browser-based ant colony simulation featuring swarm intelligence, deep resource management, and satisfying visuals.",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "lint": "eslint js/**/*.js",
+    "format": "prettier --write js/**/*.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimkap999-oss/ant-colony-sim.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimkap999-oss/ant-colony-sim/issues"
+  },
+  "homepage": "https://github.com/kimkap999-oss/ant-colony-sim#readme",
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "jest": "^30.4.2",
+    "parcel": "^2.16.4",
+    "prettier": "^3.9.4"
+  }
+}
