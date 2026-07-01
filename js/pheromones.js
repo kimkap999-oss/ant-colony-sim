@@ -31,6 +31,9 @@ export class PheromoneGrid {
             this.grids.set(type, new Float32Array(this.cols * this.rows));
         }
 
+        // Preallocate a single buffer for double-buffering during updates
+        this.tempGrid = new Float32Array(this.cols * this.rows);
+
         // Configuration
         this.evaporationRate = 0.995; // Per frame multiplier
         this.diffusionRate = 0.1;
@@ -101,7 +104,12 @@ export class PheromoneGrid {
 
         // Simple diffusion (blur)
         for (const [type, grid] of this.grids) {
-            const newGrid = new Float32Array(grid.length);
+            this.tempGrid.fill(0);
+
+            // Keep edges at 0 (or original values) by starting from 1 to row-1 / col-1,
+            // but we need to copy the current state for edges if we want exactly the same
+            // behavior as new Float32Array which initializes to 0. Since fill(0) initializes
+            // everything to 0, it behaves identically to new Float32Array.
 
             for (let row = 1; row < this.rows - 1; row++) {
                 for (let col = 1; col < this.cols - 1; col++) {
@@ -112,12 +120,14 @@ export class PheromoneGrid {
                         grid[this._index(col, row - 1)] +
                         grid[this._index(col, row + 1)];
 
-                    newGrid[idx] =
+                    this.tempGrid[idx] =
                         grid[idx] * (1 - this.diffusionRate) + (neighbors / 4) * this.diffusionRate;
                 }
             }
 
-            this.grids.set(type, newGrid);
+            // Swap buffers to avoid allocation
+            this.grids.set(type, this.tempGrid);
+            this.tempGrid = grid;
         }
     }
 
