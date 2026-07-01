@@ -142,9 +142,12 @@ export class SwarmCoordinator {
     // Get nearby signals
     getSignals(type, x, y, radius = 100) {
         const signals = this.globalSignals.get(type) || [];
+        const radiusSq = radius * radius;
+        const now = Date.now();
         return signals.filter((s) => {
-            const dist = Math.hypot(s.x - x, s.y - y);
-            return dist <= radius && Date.now() - s.time < 10000;
+            const dx = s.x - x;
+            const dy = s.y - y;
+            return dx * dx + dy * dy <= radiusSq && now - s.time < 10000;
         });
     }
 
